@@ -1,10 +1,19 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import TextList from './TextList';
 
 function TextInput() {
   const [task, setTask] = useState('');
   const [date, setDate] = useState('');
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState(() => {
+    // 🔥 Initial load pe localStorage se tasks read karenge
+    const savedTasks = localStorage.getItem('tasks');
+    return savedTasks ? JSON.parse(savedTasks) : [];
+  });
+
+  // 🔥 Jab bhi tasks change ho, localStorage update karo
+  useEffect(() => {
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+  }, [tasks]);
 
   const handleAddTask = () => {
     if (task.trim() !== '') {
@@ -14,7 +23,7 @@ function TextInput() {
           id: Date.now(),
           text: task,
           date: date || 'No date',
-          completed: false, // 🔥 NEW FIELD
+          completed: false,
         },
       ]);
       setTask('');
